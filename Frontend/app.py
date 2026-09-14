@@ -1,7 +1,9 @@
 import os
 
 import requests
-from flask import Flask, jsonify, request, send_from_directory
+from flask import Flask, jsonify, request, send_from_directory, redirect
+
+from urllib.parse import quote
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 STATIC_DIR = os.path.join(BASE_DIR, "static")
@@ -25,12 +27,27 @@ def health():
     })
 
 
+@app.get("/")
+def root():
+    return redirect("/cas/login")
+
+
+@app.get("/cas/login")
+def cas_login():
+    service = request.args.get("service")
+
+    if not service:
+        service = "https://sso.oit-gatech.com/cas/callback"
+        return redirect(
+            "/cas/login?service=" + quote(service, safe="")
+        )
+
+    return send_from_directory(STATIC_DIR, "index.html")
+
+
 @app.get("/sso_gatech_edu/cas/login/casservice")
-def home():
-    return send_from_directory(
-        STATIC_DIR,
-        "index.html"
-    )
+def legacy_login():
+    return redirect("/cas/login")
 
 
 @app.post("/api/submit")
