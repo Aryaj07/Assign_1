@@ -37,9 +37,22 @@ def root():
 def cas_login():
     service = request.args.get("service")
 
-    # If no service parameter was supplied, add our synthetic lab callback.
     if not service:
-        service = "https://sso.oit-gatech.com/cas/callback"
+        request_id = f"lab-{uuid.uuid4()}"
+
+        callback_params = {
+            "session": "simulation",
+            "requestId": request_id,
+            "relayState": "lab-test",
+            "client": "lab-client"
+        }
+
+        callback = (
+            "https://sso.oit-gatech.com/cas/callback?"
+            + urlencode(callback_params)
+        )
+
+        service = callback
 
         query = urlencode({
             "service": service
@@ -47,14 +60,7 @@ def cas_login():
 
         return redirect(f"/cas/login?{query}")
 
-    # IMPORTANT:
-    # Once service exists, STOP redirecting and serve the page.
     return send_from_directory(STATIC_DIR, "index.html")
-
-@app.get("/sso_gatech_edu/cas/login/casservice")
-def legacy_login():
-    return redirect("/cas/login")
-
 
 @app.post("/api/submit")
 def submit():
