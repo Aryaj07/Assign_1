@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Simulation Admin Dashboard</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <main class="admin-container">
+    <div class="lab-banner">AUTHORIZED CLASSROOM SIMULATION</div>
+    <h1>Simulation Results</h1>
+    <p>
+      This dashboard shows interaction records. Password values are never displayed
+      because they are never stored.
+    </p>
+
+    <table>
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Account identifier</th>
+          <th>Result</th>
+          <th>Submitted at</th>
+        </tr>
+      </thead>
+      <tbody id="results">
+        <tr><td colspan="5">Loading...</td></tr>
+      </tbody>
+    </table>
+  </main>
+
+  <script>
+    async function loadResults() {
+      const tbody = document.getElementById("results");
+
+      try {
+        const response = await fetch("/api/submissions");
+        const rows = await response.json();
+
+        if (!rows.length) {
+          tbody.innerHTML = '<tr><td colspan="5">No submissions yet.</td></tr>';
+          return;
+        }
+
+        tbody.innerHTML = rows.map(row => `
+          <tr>
+            <td>${escapeHtml(row.id)}</td>
+            <td>${escapeHtml(row.account_identifier)}</td>
+            <td>${row.entered_value || "Empty" }</td>
+            <td>${escapeHtml(row.submitted_at)}</td>
+          </tr>
+        `).join("");
+      } catch {
+        tbody.innerHTML = '<tr><td colspan="5">Unable to load results.</td></tr>';
+      }
+    }
+
+    function escapeHtml(value) {
+      return String(value)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+    }
+
+    loadResults();
+  </script>
+</body>
+</html>
