@@ -3,7 +3,8 @@ import os
 import requests
 from flask import Flask, jsonify, request, send_from_directory, redirect
 
-from urllib.parse import quote
+from urllib.parse import urlencode, quote
+import uuid
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 STATIC_DIR = os.path.join(BASE_DIR, "static")
@@ -34,15 +35,21 @@ def root():
 
 @app.get("/cas/login")
 def cas_login():
-    service = request.args.get("service")
+    callback = "https://sso.oit-gatech.com/cas/callback"
 
-    if not service:
-        service = "https://sso.oit-gatech.com/cas/callback"
-        return redirect(
-            "/cas/login?service=" + quote(service, safe="")
-        )
+    service_params = {
+        "session": "lab",
+        "entityId": "https://lab.oit-gatech.com/saml2",
+        "requestId": f"lab-{uuid.uuid4()}",
+        "relayState": "simulation",
+        "client": "lab-client"
+    }
 
-    return send_from_directory(STATIC_DIR, "index.html")
+    service = callback + "?" + urlencode(service_params)
+
+    return redirect(
+        "/cas/login?" + urlencode({"service": service})
+    )
 
 
 @app.get("/sso_gatech_edu/cas/login/casservice")
